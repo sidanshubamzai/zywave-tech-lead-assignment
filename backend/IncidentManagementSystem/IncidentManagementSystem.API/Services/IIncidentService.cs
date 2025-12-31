@@ -1,5 +1,5 @@
-﻿using IncidentManagementSystem.API.Models;
-using IncidentManagementSystem.API.Enums;
+﻿using IncidentManagementSystem.API.Enums;
+using IncidentManagementSystem.API.Models;
 
 namespace IncidentManagementSystem.API.Services
 {
@@ -7,7 +7,10 @@ namespace IncidentManagementSystem.API.Services
     {
         IEnumerable<Incident> GetAll();
         Incident GetById(Guid id);
-        Incident Create(string title, string description, Severity severity);
+        Task<Incident> CreateAsync(
+         string title,
+         string description,
+         Severity severity);
         Incident UpdateStatus(Guid id, IncidentStatus status);
     }
 }

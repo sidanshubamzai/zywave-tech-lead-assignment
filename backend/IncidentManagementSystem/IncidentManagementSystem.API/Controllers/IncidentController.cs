@@ -53,9 +53,9 @@ namespace IncidentManagementSystem.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] CreateIncidentRequest request)
+        public async Task<IActionResult>  Create([FromBody] CreateIncidentRequest request)
         {
-            var incident = _incidentService.Create(
+            var incident = await _incidentService.CreateAsync(
                 request.Title,
                 request.Description,
                 request.Severity);

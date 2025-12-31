@@ -7,10 +7,13 @@ namespace IncidentManagementSystem.API.Services
     public class IncidentService : IIncidentService
     {
         private readonly IIncidentRepository _repository;
+        private readonly IIncidentNotificationService _notificationService;
 
-        public IncidentService(IIncidentRepository repository)
+        public IncidentService(IIncidentRepository repository,
+        IIncidentNotificationService notificationService)
         {
             _repository = repository;
+            _notificationService = notificationService;
         }
 
         public IEnumerable<Incident> GetAll()
@@ -29,7 +32,7 @@ namespace IncidentManagementSystem.API.Services
             return incident;
         }
 
-        public Incident Create(string title, string description, Severity severity)
+        public async Task<Incident> CreateAsync(string title, string description, Severity severity)
         {
             var incident = new Incident
             {
@@ -39,7 +42,12 @@ namespace IncidentManagementSystem.API.Services
                 Status = IncidentStatus.Open
             };
 
-            return _repository.Add(incident);
+            _repository.Add(incident);
+
+            await _notificationService.NotifyIncidentCreatedAsync(incident);
+
+            return incident;
+
         }
 
         public Incident UpdateStatus(Guid id, IncidentStatus status)

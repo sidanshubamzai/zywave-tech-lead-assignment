@@ -11,6 +11,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IIncidentRepository, InMemoryIncidentRepository>();
 builder.Services.AddScoped<IIncidentService, IncidentService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddHttpClient<IIncidentNotificationService,
+    AzureFunctionIncidentNotificationService>();
 
 var app = builder.Build();
 
