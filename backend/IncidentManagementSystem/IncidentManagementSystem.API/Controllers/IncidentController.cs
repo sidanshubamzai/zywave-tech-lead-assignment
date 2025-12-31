@@ -1,5 +1,4 @@
 ﻿using IncidentManagementSystem.API.DTOs;
-using IncidentManagementSystem.API.Enums;
 using IncidentManagementSystem.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -93,5 +92,22 @@ namespace IncidentManagementSystem.API.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("{id}/attachments")]
+        public async Task<IActionResult> UploadAttachment(Guid id, IFormFile file, [FromServices] IBlobStorageService blobStorageService)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File is required");
+
+            var fileName = $"{id}/{Guid.NewGuid()}_{file.FileName}";
+            var blobUrl = await blobStorageService.UploadAsync(file, fileName);
+
+            return Ok(new
+            {
+                FileName = file.FileName,
+                BlobUrl = blobUrl
+            });
+        }
+
     }
 }
