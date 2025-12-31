@@ -1,5 +1,6 @@
 using IncidentManagementSystem.API.Data;
 using IncidentManagementSystem.API.Middleware;
+using IncidentManagementSystem.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IIncidentRepository, InMemoryIncidentRepository>();
+builder.Services.AddScoped<IIncidentService, IncidentService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
