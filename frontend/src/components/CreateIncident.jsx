@@ -50,11 +50,11 @@ export default function CreateIncident({ onCreated }) {
 
   return (
     <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-      <h3>Create Incident</h3>
+      <h2>Create Incident</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <div>
+      <div style={{ marginBottom: "10px" }}>
         <input
           placeholder="Title"
           value={form.title}
@@ -65,7 +65,7 @@ export default function CreateIncident({ onCreated }) {
         />
       </div>
 
-      <div>
+      <div style={{ marginBottom: "10px" }}>
         <textarea
           placeholder="Description"
           value={form.description}
@@ -76,7 +76,7 @@ export default function CreateIncident({ onCreated }) {
         />
       </div>
 
-      <div>
+     <div style={{ marginBottom: "10px" }}>
         <select
           value={form.severity}
           onChange={(e) =>
@@ -89,16 +89,20 @@ export default function CreateIncident({ onCreated }) {
         </select>
       </div>
 
-      <div>
+      <div style={{ marginBottom: "10px" }}>
         <input
           type="file"
           onChange={(e) => setFile(e.target.files[0])}
         />
       </div>
 
-      <button type="submit" disabled={submitting}>
-        {submitting ? "Creating..." : "Create Incident"}
-      </button>
+          <button type="submit" disabled={submitting} style={{
+              padding: "6px 12px",
+              cursor: "pointer"
+          }}>
+              {submitting ? "Creating..." : "Create Incident"}
+          </button>
+
     </form>
   );
 }
