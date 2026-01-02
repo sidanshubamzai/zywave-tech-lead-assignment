@@ -17,5 +17,7 @@ namespace IncidentManagementSystem.API.Models
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAtUtc { get; set; }
+
+        public List<IncidentAttachment> Attachments { get; set; } = new();
     }
 }

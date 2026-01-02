@@ -1,4 +1,6 @@
-﻿using IncidentManagementSystem.API.DTOs;
+﻿using IncidentManagementSystem.API.Data;
+using IncidentManagementSystem.API.DTOs;
+using IncidentManagementSystem.API.Models;
 using IncidentManagementSystem.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +11,12 @@ namespace IncidentManagementSystem.API.Controllers
     public class IncidentController : ControllerBase
     {
         private readonly IIncidentService _incidentService;
+        private readonly IIncidentRepository _incidentRepository;
 
-        public IncidentController(IIncidentService incidentService)
+        public IncidentController(IIncidentService incidentService, IIncidentRepository incidentRepository)
         {
             _incidentService = incidentService;
+            _incidentRepository = incidentRepository;
         }
 
         [HttpGet]
@@ -27,7 +31,13 @@ namespace IncidentManagementSystem.API.Controllers
                     Severity = i.Severity,
                     Status = i.Status,
                     CreatedAtUtc = i.CreatedAtUtc,
-                    UpdatedAtUtc = i.UpdatedAtUtc
+                    UpdatedAtUtc = i.UpdatedAtUtc,
+                    Attachments = i.Attachments.Select(a => new IncidentAttachmentResponse
+                    {
+                        FileName = a.FileName,
+                        BlobUrl = a.BlobUrl,
+                        UploadedAtUtc = a.UploadedAtUtc
+                    }).ToList()
                 });
 
             return Ok(incidents);
@@ -38,6 +48,9 @@ namespace IncidentManagementSystem.API.Controllers
         {
             var incident = _incidentService.GetById(id);
 
+            if (incident == null)
+                return NotFound();
+
             var response = new IncidentResponse
             {
                 Id = incident.Id,
@@ -46,11 +59,18 @@ namespace IncidentManagementSystem.API.Controllers
                 Severity = incident.Severity,
                 Status = incident.Status,
                 CreatedAtUtc = incident.CreatedAtUtc,
-                UpdatedAtUtc = incident.UpdatedAtUtc
+                UpdatedAtUtc = incident.UpdatedAtUtc,
+                Attachments = incident.Attachments.Select(a => new IncidentAttachmentResponse
+                {
+                    FileName = a.FileName,
+                    BlobUrl = a.BlobUrl,
+                    UploadedAtUtc = a.UploadedAtUtc
+                }).ToList()
             };
 
             return Ok(response);
         }
+
 
         [HttpPost]
         public async Task<IActionResult>  Create([FromBody] CreateIncidentRequest request)
@@ -94,19 +114,29 @@ namespace IncidentManagementSystem.API.Controllers
         }
 
         [HttpPost("{id}/attachments")]
+       // [Consumes("multipart/form-data")]
         public async Task<IActionResult> UploadAttachment(Guid id, IFormFile file, [FromServices] IBlobStorageService blobStorageService)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("File is required");
+            if (file.Length > 5 * 1024 * 1024)
+                return BadRequest("Max file size is 5 MB");
+
+            var incident = _incidentRepository.GetById(id);
+            if (incident == null)
+                return NotFound();
 
             var fileName = $"{id}/{Guid.NewGuid()}_{file.FileName}";
             var blobUrl = await blobStorageService.UploadAsync(file, fileName);
 
-            return Ok(new
+            incident.Attachments.Add(new IncidentAttachment
             {
                 FileName = file.FileName,
-                BlobUrl = blobUrl
+                BlobUrl = blobUrl,
+                UploadedAtUtc = DateTime.UtcNow
             });
+
+            return Ok(incident.Attachments);
         }
 
     }
