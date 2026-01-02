@@ -16,3 +16,16 @@ obj/
 # OS
 .DS_Store
 Thumbs.db
+
+# Azure publish artifacts
+**/Properties/PublishProfiles/
+**/Properties/ServiceDependencies/
+**/Properties/ServiceDependencies/**/*.json
+
+# Azure Functions local settings
+**/local.settings.json
+**/launchSettings.json
+
+# Build output
+bin/
+obj/
